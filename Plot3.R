@@ -15,14 +15,14 @@ part2 <- subset(d1,d1$Date=="2007-02-02")
 edata <- rbind(part1,part2)
 
 # Draw and save plot 3 as png
-#Open png file
-png("Plot 3.png",width=480,height=480)
+
+windows()
 
 #draw the plot
 plot(edata$Sub_metering_1,type="l",ylim=c(0,45),col="black",xaxt="n",xlab=" ",ylab="Energy Sub meterring")
 lines(edata$Sub_metering_2,type="l",ylim=c(0,45),col="red")
 lines(edata$Sub_metering_3,type="l",ylim=c(0,45),col="blue")
 axis(1, at=c(0,1500,2800),labels=c("Thu","Fri","Sat"),col.axis="black",las=1)
-legend(2370,46.5,legend=c("Sub_metering_1","Sub_metering_2","Sub_metering_3"),lwd=c(2.5,2.5,2.5),col=c("black","red","blue"))
+legend(2370,46.5,legend=c("Sub_metering_1","Sub_metering_2","Sub_metering_3"),lwd=c(0.5,0.5,0.5),col=c("black","red","blue"),cex=0.6)
 
 dev.off()
