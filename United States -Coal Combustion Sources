@@ -1,0 +1,49 @@
+#(In case of any confusion, please just copy and paste the code in R, and execute it). 
+
+#Required package
+library(plyr)
+library(lattice)
+libarary(ggplot2)
+
+#read the source files
+SCC <- readRDS(file.choose())
+NEI <- readRDS(file.choose())
+
+#Search for word 'Coal' in SCC , to retrieve the codes
+t <- grep('*[cC]oal*',SCC$Short.Name)
+str(t) #: 1185 observation
+
+# Move data to SCCCOdes, check str and data
+SCCCodes <- SCC[t,]
+str(SCCCodes) #: 1185 observation
+head(SCCCodes)
+
+# Search for Combustion in SCCCodes to get sources = Coal Combustion 
+r <- grep('*[cC]omb*',SCCCodes$Short.Name)
+str(r) : # 127 observation
+head(r)
+
+# Move the data to dataCC - relevant data for source = "Coal Combustion"
+dataCC <- SCCCodes[r,]
+str(dataCC) #: 127 observation
+head(dataCC)
+
+# Move only the SSC Codes of all relevant sources
+CCCodes <-dataCC[,1]
+
+# Subset data for specific codes
+data1 <- subset(NEI,NEI$SCC %in% CCCodes)
+str(data1) # : 43261 observations
+
+#Summarize the relevant data
+data2 <- ddply(data1,.(year),function(x) sum(x$Emissions)/1000)
+names(data2) <- c("Year","Emissions")
+str(data2) #: observations
+
+#Now, plot the figure
+# No file size specified in questionnaire for plot, so nothing mentioned for width and height in png function. 
+png("United States -Coal Combustion Sources")
+
+qplot(Year,Emissions,data=data2,geom="line",xlab="Year(1999-2008)",ylab="PM2.5 Emissions (1000s)",main="United States -Coal Combustion Sources : PM2.5 Emissions(1999~2008)",xlim=c(1999,2008))
+
+dev.off()
