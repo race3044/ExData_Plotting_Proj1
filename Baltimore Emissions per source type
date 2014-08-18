@@ -1,0 +1,33 @@
+#(In case of any confusion, please just copy and paste the code in R, and execute it). 
+
+#Required Package
+library(plyr)
+library(lattice)
+library(ggplot2)
+
+# Read the source file into NEI
+NEI <- readRDS(file.choose())
+
+# Create a subset with Emissions,year,fips and type columns
+data1 <- subset(NEI, select = c(Emissions,fips,type,year))
+str(data1)
+
+#filter Baltimore data
+data2 <- subset(data1,fips=="24510")
+#subset only below 3 columns to process
+data2 <-subset(data2,select = c(Emissions,type,year))
+
+#Apply ddply function to summarize the data as required
+data3 <- ddply(data2, c("year","type"), function (x) sum(x$Emissions))
+# check the structure of data3
+str(data3)
+#Rename the column names of data3
+names(data3) <- c("Year","type","Emissions")
+
+#Now, plot the figure
+# No file size specified in questionnaire for plot, so nothing mentioned for width and height in png function. 
+png("Baltimore PM2.5 Emissions per source type")
+
+qplot(Year,Emissions,data=data3,geom="line",col=type,facets=.~type,xlab="Year(1999-2008)",ylab="PM2.5 Emissions",main="Baltimore PM2.5 Emissions(1999~2008) - Source Type",xlim=c(1999,2008))
+
+dev.off()
