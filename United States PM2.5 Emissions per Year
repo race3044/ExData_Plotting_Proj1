@@ -1,0 +1,26 @@
+#(In case of any confusion, please just copy and paste the code in R, and execute it). 
+
+#Required Package
+library(plyr)
+library(lattice)
+
+# Read the source file into NEI
+NEI <- readRDS(file.choose())
+
+# Create a subset with Year and Emissions columns
+data1 <- subset(NEI, select = c(Emissions,year))
+str(data1)
+
+# Summarize the data by year 
+data2 <- ddply(data1, .(year), function (x) sum(x$Emissions)/1000) # Value/1000 just to keep the scale better and small 
+str(data2)
+names(data2) <- c("Year","Emissions")
+head(data2)
+
+# Now, plot the graph between and year and Emissions for whole United States 
+# No file specified in questionaire, so nothing mentioned for width and height in png function. 
+png("United States : PM2.5 Emissions per Year")
+
+plot(data2$Emissions~data2$Year,xlim=c(1998,2008),type ="l",xlab="Year",ylab="PM2.5 Emissions (in 1000s)",main="United States : PM2.5 Emissions per Year ( 1998-2008)")
+
+dev.off()
