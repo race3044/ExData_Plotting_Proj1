@@ -1,0 +1,51 @@
+#(In case of any confusion, please just copy and paste the code in R, and execute it). 
+
+# Required Package
+library(plyr)
+library(lattice)
+library(ggplot2)
+
+#read the source files
+SCC <- readRDS(file.choose())
+NEI <- readRDS(file.choose())
+
+#Search for word 'Motor' in SCC , to retrieve the codes
+t <- grep('*[mM]otor*',SCC$Short.Name)
+str(t) #: 138 observation
+
+# Move data to SCCCOdes, check str and data
+SCCCodes <- SCC[t,]
+str(SCCCodes) #: 138 observation
+head(SCCCodes)
+
+# Search for "Vehicle" in SCCCodes to get sources = Motor Vehicle
+r <- grep('*[vV]eh*',SCCCodes$Short.Name)
+str(r) : # 132 observation
+head(r)
+
+# Move the data to dataCC - relevant data for source = "Motor Vehicle"
+dataCC <- SCCCodes[r,]
+str(dataCC)  # :132 observation
+head(dataCC)
+
+# Move only the SSC Codes of all relevant sources
+CCCodes <-dataCC[,1]
+
+# Subset data for specific codes
+data1 <- subset(NEI,NEI$SCC %in% CCCodes)
+str(data1)  #:237763 observation
+data1 <- subset(data1,fips=="24510")
+str(data1) #: 88 observations
+
+#Summarize the relevant data
+data2 <- ddply(data1,.(year),function(x) sum(x$Emissions))
+names(data2) <- c("Year","Emissions")
+str(data2) #: 4 observations
+
+#Now, plot the figure
+# No file size specified in questionnaire for plot, so nothing mentioned for width and height in png function. 
+png("Baltimore Motor Vehicle Sources Sources")
+
+qplot(Year,Emissions,data=data2,geom="line",xlab="Year(1999-2008)",ylim=c(0,20),ylab="PM2.5 Emissions",main="Baltimore Motor Vehicle Sources : PM2.5 Emissions(1999~2008)",xlim=c(1999,2008))
+
+dev.off()
